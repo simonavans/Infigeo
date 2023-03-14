@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class Main extends Application implements GraphicsEngine
 {
-    public static final double LEVEL_SCROLL_SPEED = 800;
+    public static final double LEVEL_SCROLL_SPEED = 870;
 
     private Canvas canvas;
     private Label mousePosLog;
@@ -35,10 +35,12 @@ public class Main extends Application implements GraphicsEngine
     private ArrayList<Obstacle> obstaclesWithCollision;
     private ArrayList<Obstacle> obstaclesToRemove;
 
+    private ArrayList<MapSection> mapSections;
     private ArrayList<BufferedImage> cubeIcons;
     private ArrayList<BufferedImage> obstacleSprites;
 
     private double obstacleSpawnTime;
+    private int currentMapColumn;
 
     @Override
     public void init()
@@ -47,6 +49,7 @@ public class Main extends Application implements GraphicsEngine
 
         try
         {
+            this.mapSections = MapIO.loadMap(ImageIO.read(getClass().getResource("/obstacles.png")), canvas.getWidth());
             BufferedImage cubeIconSheet = ImageIO.read(getClass().getResource("/icons_cube.png"));
             cubeIcons = new ArrayList<>();
             for (int i = 0; i < 10; i++)
@@ -124,7 +127,7 @@ public class Main extends Application implements GraphicsEngine
         primaryStage.setTitle("Infigeo");
         primaryStage.show();
 
-        new AccumulationTimer(60, this, graphics);
+//        new AccumulationTimer(60, this, graphics);
     }
 
     @Override
@@ -137,25 +140,13 @@ public class Main extends Application implements GraphicsEngine
         // Spawn obstacles at random intervals
         if (obstacleSpawnTime <= 0)
         {
-            obstacles.add(new Block(
-                    obstacleSprites,
-                    new Point2D.Double(canvas.getWidth(), 270),
-                    1,
-                    this
-            ));
-            obstacles.add(new Block(
-                    obstacleSprites,
-                    new Point2D.Double(canvas.getWidth() + 75, 270),
-                    1,
-                    this
-            ));
-            obstacles.add(new Block(
-                    obstacleSprites,
-                    new Point2D.Double(canvas.getWidth() + 75, 345),
-                    1,
-                    this
-            ));
-            obstacleSpawnTime = 2 + Math.random();
+            ArrayList<Obstacle> obstacleColumn = mapSections.get(0).getColumn(currentMapColumn);
+            for (Obstacle obstacle : obstacleColumn)
+                if (obstacle != null)
+                    obstacles.add(obstacle);
+
+            currentMapColumn = (currentMapColumn + 1) % mapSections.get(0).getWidth();
+            obstacleSpawnTime = 0.083;
         }
         obstacleSpawnTime -= deltaTime;
 

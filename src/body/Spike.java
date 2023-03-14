@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Spike extends Obstacle {
-    public Spike(ArrayList<BufferedImage> obstacleSprites, Point2D position, float scale, GraphicsEngine callback) {
-        super(new Rectangle2D.Double(), obstacleSprites.get(1), position, scale, callback);
+    public Spike(BufferedImage sprite, Point2D position, float scale, GraphicsEngine callback) {
+        super(new Rectangle2D.Double(), sprite, position, scale, callback);
 
         GeneralPath triangle = new GeneralPath();
         triangle.moveTo(0, 0);

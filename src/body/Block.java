@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Block extends Obstacle {
-    public Block(ArrayList<BufferedImage> obstacleSprites, Point2D position, float scale, GraphicsEngine callback) {
-        super(new Rectangle2D.Double(0, 0, 75, 75), obstacleSprites.get(0), position, scale, callback);
+    public Block(BufferedImage sprite, Point2D position, float scale, GraphicsEngine callback) {
+        super(new Rectangle2D.Double(0, 0, 75, 75), sprite, position, scale, callback);
 
         calculateTransformAndShape();
     }
