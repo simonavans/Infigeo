@@ -13,6 +13,8 @@ public class Obstacle extends Body
     private double currentScroll;
     private final GraphicsEngine callback;
 
+    private boolean hasCollision;
+
     public Obstacle(Shape shape, BufferedImage texture, Point2D position, float rotation, float scale, GraphicsEngine callback)
     {
         super(shape, texture, position, rotation, scale);
@@ -30,9 +32,17 @@ public class Obstacle extends Body
         currentScroll -= deltaTime * scrollSpeed;
         setPosition(new Point2D.Double(currentScroll, position.getY()));
 
-        if (position.getX() < -shape.getBounds2D().getWidth())
+        if (!hasCollision && position.getX() > 625 && position.getX() <= 775) {
+            callback.addCollisionToObstacle(this);
+            hasCollision = true;
+        }
+        else if (hasCollision && position.getX() <= 625) {
+            callback.removeCollisionFromObstacle(this);
+            hasCollision = false;
+        }
+        else if (position.getX() < -shape.getBounds2D().getWidth())
         {
-            callback.removeObstacle(this);
+            callback.scheduleObstacleRemoval(this);
         }
     }
 }

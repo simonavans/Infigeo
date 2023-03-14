@@ -1,6 +1,5 @@
 package application;
 
-import body.Body;
 import body.Obstacle;
 import body.Player;
 import body.ScrollableBody;
@@ -16,11 +15,12 @@ import org.jfree.fx.FXGraphics2D;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Area;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Main extends Application implements GraphicsEngine
 {
@@ -33,6 +33,7 @@ public class Main extends Application implements GraphicsEngine
     private ScrollableBody ground;
     private Player player;
     private ArrayList<Obstacle> obstacles;
+    private ArrayList<Obstacle> obstaclesWithCollision;
     private ArrayList<Obstacle> obstaclesToRemove;
 
     private ArrayList<BufferedImage> cubeIcons;
@@ -88,12 +89,19 @@ public class Main extends Application implements GraphicsEngine
 
             obstacles = new ArrayList<>();
             obstaclesToRemove = new ArrayList<>();
+            obstaclesWithCollision = new ArrayList<>();
+
+            FXGraphics2D graphics = new FXGraphics2D(canvas.getGraphicsContext2D());
+            graphics.scale(1, -1);
+            graphics.translate(0, -canvas.getHeight());
 
             canvas.setFocusTraversable(true);
             canvas.setOnKeyPressed(e ->
             {
                 if (e.getCode() == KeyCode.SPACE) player.jump();
                 else if (e.getCode() == KeyCode.E) player.cycleIcon();
+                //todo debugging
+                else if (e.getCode() == KeyCode.RIGHT) { update(1 / 60d); draw(graphics); }
             });
         }
         catch (IOException e)
@@ -123,21 +131,13 @@ public class Main extends Application implements GraphicsEngine
     @Override
     public void update(double deltaTime)
     {
+        // Update textures of ScrollableBodies
         for (ScrollableBody scrollableBody : scrollableBodies)
             scrollableBody.update(deltaTime);
 
-        player.update(deltaTime);
-
+        // Spawn obstacles at random intervals
         if (obstacleSpawnTime <= 0)
         {
-            obstacles.add(new Obstacle(
-                    new Rectangle2D.Double(0, 0, 75, 75),
-                    obstacleSprites.get(0),
-                    new Point2D.Double(canvas.getWidth(), 270),
-                    0,
-                    1,
-                    this
-            ));
             obstacles.add(new Obstacle(
                     new Rectangle2D.Double(0, 0, 75, 75),
                     obstacleSprites.get(0),
@@ -150,20 +150,52 @@ public class Main extends Application implements GraphicsEngine
         }
         obstacleSpawnTime -= deltaTime;
 
+        // Update obstacles
         for (Obstacle obstacle : obstacles)
             obstacle.update(deltaTime);
 
+        // Remove obstacles which are out of bounds
         for (Obstacle obstacle : obstaclesToRemove)
             obstacles.remove(obstacle);
 
-        Area groundArea = new Area(ground.getTransformedShape());
-        groundArea.intersect(new Area(player.getTransformedShape()));
+        // Create an Area which amounts to the surface of
+        // all elements in objectsWithCollision
+        Area collisionArea = new Area();
 
-        if (!groundArea.isEmpty() && player.getAcceleration() < 0)
+        if (obstaclesWithCollision.size() > 0)
         {
+            for (Obstacle obstacle : obstaclesWithCollision)
+                collisionArea.add(new Area(obstacle.getTransformedShape()));
+
+            Area fatalCollisionArea = (Area) collisionArea.clone();
+            fatalCollisionArea.intersect(new Area(player.getTransformedShape()));
+
+            // If the player's Area and fatalCollisionArea's Area overlap,
+            // then the player is dead.
+            Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
+            if (collisionShape.getWidth() >= 5 && collisionShape.getHeight() >= 5)
+            {
+                gameOver();
+                return;
+            }
+        }
+
+        // Update the player
+        player.update(deltaTime);
+
+        // Create an Area that combines collisionArea and
+        // the Area of the ground
+        collisionArea.add(new Area(ground.getTransformedShape()));
+        collisionArea.intersect(new Area(player.getTransformedShape()));
+
+        // Check for non-fatal collisions
+        if (!collisionArea.isEmpty() && player.getAcceleration() < 0)
+        {
+            // Correct the player's position to be right above the platform
+            // which it is grounded on.
             player.setPosition(new Point2D.Double(
                     player.getPosition().getX(),
-                    player.getPosition().getY() + groundArea.getBounds2D().getHeight()
+                    player.getPosition().getY() + collisionArea.getBounds2D().getHeight()
             ));
             player.setGrounded(true);
         }
@@ -180,16 +212,39 @@ public class Main extends Application implements GraphicsEngine
 
         player.draw(graphics);
 
-        for (Obstacle obstacle : obstacles) {
+        for (Obstacle obstacle : obstacles)
             obstacle.draw(graphics);
-        }
     }
 
     @Override
-    public void removeObstacle(Obstacle obstacle)
+    public void addCollisionToObstacle(Obstacle obstacle)
+    {
+        obstaclesWithCollision.add(obstacle);
+    }
+
+    @Override
+    public void removeCollisionFromObstacle(Obstacle obstacle)
+    {
+        obstaclesWithCollision.remove(obstacle);
+    }
+
+    @Override
+    public void scheduleObstacleRemoval(Obstacle obstacle)
     {
         obstaclesToRemove.add(obstacle);
     }
 
-    public static void main(String[] args) { launch(Main.class); }
+    private void gameOver()
+    {
+        obstaclesToRemove.clear();
+        obstaclesWithCollision.clear();
+        obstacles.clear();
+        obstacleSpawnTime = 2 + Math.random();
+        player.reset();
+    }
+
+    public static void main(String[] args)
+    {
+        launch(Main.class);
+    }
 }
