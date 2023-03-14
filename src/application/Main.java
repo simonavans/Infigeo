@@ -139,11 +139,17 @@ public class Main extends Application implements GraphicsEngine
         {
             obstacles.add(new Block(
                     obstacleSprites,
-                    new Point2D.Double(canvas.getWidth(), 345),
+                    new Point2D.Double(canvas.getWidth(), 270),
                     1,
                     this
             ));
-            obstacles.add(new Spike(
+            obstacles.add(new Block(
+                    obstacleSprites,
+                    new Point2D.Double(canvas.getWidth() + 75, 270),
+                    1,
+                    this
+            ));
+            obstacles.add(new Block(
                     obstacleSprites,
                     new Point2D.Double(canvas.getWidth() + 75, 345),
                     1,
@@ -182,7 +188,7 @@ public class Main extends Application implements GraphicsEngine
             // If the player's Area and fatalCollisionArea's Area overlap,
             // then the player is dead.
             Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
-            if (collisionShape.getWidth() >= 5 && collisionShape.getHeight() >= 5)
+            if (collisionShape.getWidth() > 14)
             {
                 gameOver();
                 return;
