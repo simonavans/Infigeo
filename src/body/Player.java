@@ -48,13 +48,10 @@ public class Player extends Body
             // If the player is slightly tilted on the platform it is grounded on,
             // correct the rotation of the player.
             if (overRotationDegrees <= -45)
-            {
                 overRotationDegrees = roundToMultiple((overRotationDegrees - ROTATE_SPEED_LANDING) % 90, ROTATE_SPEED_LANDING);
-            }
             else
-            {
                 overRotationDegrees = roundToMultiple((overRotationDegrees + ROTATE_SPEED_LANDING) % 90, ROTATE_SPEED_LANDING);
-            }
+
             setPosition(new Point2D.Double(position.getX(), position.getY() - 5));
             setRotationDegrees(overRotationDegrees);
         }

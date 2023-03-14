@@ -1,8 +1,6 @@
 package application;
 
-import body.Obstacle;
-import body.Player;
-import body.ScrollableBody;
+import body.*;
 import interfaces.GraphicsEngine;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,6 +14,7 @@ import org.jfree.fx.FXGraphics2D;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -138,11 +137,15 @@ public class Main extends Application implements GraphicsEngine
         // Spawn obstacles at random intervals
         if (obstacleSpawnTime <= 0)
         {
-            obstacles.add(new Obstacle(
-                    new Rectangle2D.Double(0, 0, 75, 75),
-                    obstacleSprites.get(0),
+            obstacles.add(new Block(
+                    obstacleSprites,
                     new Point2D.Double(canvas.getWidth(), 345),
-                    0,
+                    1,
+                    this
+            ));
+            obstacles.add(new Spike(
+                    obstacleSprites,
+                    new Point2D.Double(canvas.getWidth() + 75, 345),
                     1,
                     this
             ));
@@ -161,11 +164,17 @@ public class Main extends Application implements GraphicsEngine
         // Create an Area which amounts to the surface of
         // all elements in objectsWithCollision
         Area collisionArea = new Area();
+        Area spikeArea = new Area();
 
         if (obstaclesWithCollision.size() > 0)
         {
             for (Obstacle obstacle : obstaclesWithCollision)
-                collisionArea.add(new Area(obstacle.getTransformedShape()));
+            {
+                if (obstacle instanceof Block)
+                    collisionArea.add(new Area(obstacle.getTransformedShape()));
+                else if (obstacle instanceof Spike)
+                    spikeArea.add(new Area(obstacle.getTransformedShape()));
+            }
 
             Area fatalCollisionArea = (Area) collisionArea.clone();
             fatalCollisionArea.intersect(new Area(player.getTransformedShape()));
@@ -182,6 +191,13 @@ public class Main extends Application implements GraphicsEngine
 
         // Update the player
         player.update(deltaTime);
+
+        spikeArea.intersect(new Area(player.getTransformedShape()));
+        if (!spikeArea.isEmpty())
+        {
+            gameOver();
+            return;
+        }
 
         // Create an Area that combines collisionArea and
         // the Area of the ground

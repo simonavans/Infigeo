@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-public class Obstacle extends Body
+public abstract class Obstacle extends Body
 {
     private final double scrollSpeed;
     private double currentScroll;
@@ -15,15 +15,13 @@ public class Obstacle extends Body
 
     private boolean hasCollision;
 
-    public Obstacle(Shape shape, BufferedImage texture, Point2D position, float rotation, float scale, GraphicsEngine callback)
+    public Obstacle(Shape shape, BufferedImage texture, Point2D position, float scale, GraphicsEngine callback)
     {
-        super(shape, texture, position, rotation, scale);
+        super(shape, texture, position, 0, scale);
 
         scrollSpeed = Main.LEVEL_SCROLL_SPEED;
         currentScroll = position.getX();
         this.callback = callback;
-
-        calculateTransformAndShape();
     }
 
     @Override
