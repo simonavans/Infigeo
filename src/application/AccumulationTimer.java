@@ -1,3 +1,5 @@
+package application;
+
 import interfaces.GraphicsEngine;
 import javafx.animation.AnimationTimer;
 import org.jfree.fx.FXGraphics2D;

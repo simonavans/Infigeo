@@ -1,3 +1,6 @@
+package application;
+
+import body.Body;
 import body.Obstacle;
 import body.Player;
 import body.ScrollableBody;
@@ -17,9 +20,12 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Main extends Application implements GraphicsEngine
 {
+    public static final double LEVEL_SCROLL_SPEED = 800;
+
     private Canvas canvas;
     private Label mousePosLog;
 
@@ -27,9 +33,12 @@ public class Main extends Application implements GraphicsEngine
     private ScrollableBody ground;
     private Player player;
     private ArrayList<Obstacle> obstacles;
+    private ArrayList<Obstacle> obstaclesToRemove;
 
     private ArrayList<BufferedImage> cubeIcons;
     private ArrayList<BufferedImage> obstacleSprites;
+
+    private double obstacleSpawnTime;
 
     @Override
     public void init()
@@ -60,7 +69,7 @@ public class Main extends Application implements GraphicsEngine
             ));
             ground = new ScrollableBody(
                     ImageIO.read(getClass().getResource("/ground.png")),
-                    800,
+                    LEVEL_SCROLL_SPEED,
                     400,
                     270,
                     canvas.getWidth(),
@@ -78,20 +87,7 @@ public class Main extends Application implements GraphicsEngine
             );
 
             obstacles = new ArrayList<>();
-            obstacles.add(new Obstacle(
-                    new Rectangle2D.Double(0, 0, 75, 75),
-                    obstacleSprites.get(0),
-                    new Point2D.Double(800, 270),
-                    0,
-                    1
-            ));
-            obstacles.add(new Obstacle(
-                    new Rectangle2D.Double(0, 0, 75, 75),
-                    obstacleSprites.get(0),
-                    new Point2D.Double(800, 345),
-                    0,
-                    1
-            ));
+            obstaclesToRemove = new ArrayList<>();
 
             canvas.setFocusTraversable(true);
             canvas.setOnKeyPressed(e ->
@@ -132,6 +128,34 @@ public class Main extends Application implements GraphicsEngine
 
         player.update(deltaTime);
 
+        if (obstacleSpawnTime <= 0)
+        {
+            obstacles.add(new Obstacle(
+                    new Rectangle2D.Double(0, 0, 75, 75),
+                    obstacleSprites.get(0),
+                    new Point2D.Double(canvas.getWidth(), 270),
+                    0,
+                    1,
+                    this
+            ));
+            obstacles.add(new Obstacle(
+                    new Rectangle2D.Double(0, 0, 75, 75),
+                    obstacleSprites.get(0),
+                    new Point2D.Double(canvas.getWidth(), 345),
+                    0,
+                    1,
+                    this
+            ));
+            obstacleSpawnTime = 2 + Math.random();
+        }
+        obstacleSpawnTime -= deltaTime;
+
+        for (Obstacle obstacle : obstacles)
+            obstacle.update(deltaTime);
+
+        for (Obstacle obstacle : obstaclesToRemove)
+            obstacles.remove(obstacle);
+
         Area groundArea = new Area(ground.getTransformedShape());
         groundArea.intersect(new Area(player.getTransformedShape()));
 
@@ -159,6 +183,12 @@ public class Main extends Application implements GraphicsEngine
         for (Obstacle obstacle : obstacles) {
             obstacle.draw(graphics);
         }
+    }
+
+    @Override
+    public void removeObstacle(Obstacle obstacle)
+    {
+        obstaclesToRemove.add(obstacle);
     }
 
     public static void main(String[] args) { launch(Main.class); }
