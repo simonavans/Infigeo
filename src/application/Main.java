@@ -124,7 +124,7 @@ public class Main extends Application implements GraphicsEngine
         primaryStage.setTitle("Infigeo");
         primaryStage.show();
 
-        new AccumulationTimer(60, this, graphics);
+//        new AccumulationTimer(60, this, graphics);
     }
 
     @Override
@@ -149,12 +149,12 @@ public class Main extends Application implements GraphicsEngine
                     1,
                     this
             ));
-            obstacles.add(new Block(
-                    obstacleSprites,
-                    new Point2D.Double(canvas.getWidth() + 75, 345),
-                    1,
-                    this
-            ));
+//            obstacles.add(new Block(
+//                    obstacleSprites,
+//                    new Point2D.Double(canvas.getWidth() + 75, 345),
+//                    1,
+//                    this
+//            ));
             obstacleSpawnTime = 2 + Math.random();
         }
         obstacleSpawnTime -= deltaTime;
@@ -190,8 +190,9 @@ public class Main extends Application implements GraphicsEngine
             Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
             if (collisionShape.getWidth() > 14)
             {
-                gameOver();
-                return;
+                System.out.println(collisionShape.getWidth());
+//                gameOver();
+//                return;
             }
         }
 
