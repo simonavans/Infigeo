@@ -16,7 +16,8 @@ public class MapSection {
     {
         ArrayList<Obstacle> obstacleColumn = new ArrayList<>();
         for (Obstacle[] obstacleRow : obstacleMap)
-            obstacleColumn.add(obstacleRow[number]);
+            if (obstacleRow[number] != null)
+                obstacleColumn.add(obstacleRow[number]);
         return obstacleColumn;
     }
 

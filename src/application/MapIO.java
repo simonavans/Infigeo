@@ -2,6 +2,7 @@ package application;
 
 import body.Block;
 import body.Obstacle;
+import body.Spike;
 import interfaces.GraphicsEngine;
 
 import javax.json.Json;
@@ -41,7 +42,7 @@ public class MapIO
                 Obstacle[][] obstacleMap = new Obstacle[10][mapWidth];
                 for (int y = 0; y < section.size(); y++)
                 {
-                    JsonArray sectionRow = section.getJsonArray(y);
+                    JsonArray sectionRow = section.getJsonArray(section.size()-1-y);
                     for (int x = 0; x < sectionRow.size(); x++)
                     {
                         sectionData[y][x] = sectionRow.getJsonNumber(x).intValue();
@@ -50,23 +51,23 @@ public class MapIO
                             case 1:
                                 obstacleMap[y][x] = new Block(
                                         blockImage,
-                                        new Point2D.Double(canvasWidth + 75, y * 75),
+                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
                                 break;
                             case 2:
-                                obstacleMap[y][x] = new Block(
+                                obstacleMap[y][x] = new Spike(
                                         spikeUpImage,
-                                        new Point2D.Double(canvasWidth + 75, y * 75),
+                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
                                 break;
                             case 3:
-                                obstacleMap[y][x] = new Block(
+                                obstacleMap[y][x] = new Spike(
                                         spikeDownImage,
-                                        new Point2D.Double(canvasWidth + 75, y * 75),
+                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
@@ -81,6 +82,8 @@ public class MapIO
         {
             throw new RuntimeException(e);
         }
+
+
 
         return mapSections;
     }

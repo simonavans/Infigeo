@@ -141,9 +141,7 @@ public class Main extends Application implements GraphicsEngine
         if (obstacleSpawnTime <= 0)
         {
             ArrayList<Obstacle> obstacleColumn = mapSections.get(0).getColumn(currentMapColumn);
-            for (Obstacle obstacle : obstacleColumn)
-                if (obstacle != null)
-                    obstacles.add(obstacle);
+            obstacles.addAll(obstacleColumn);
 
             currentMapColumn = (currentMapColumn + 1) % mapSections.get(0).getWidth();
             obstacleSpawnTime = 0.083;
@@ -157,6 +155,7 @@ public class Main extends Application implements GraphicsEngine
         // Remove obstacles which are out of bounds
         for (Obstacle obstacle : obstaclesToRemove)
             obstacles.remove(obstacle);
+        obstaclesToRemove.clear();
 
         // Create an Area which amounts to the surface of
         // all elements in objectsWithCollision
@@ -232,6 +231,8 @@ public class Main extends Application implements GraphicsEngine
     @Override
     public void addCollisionToObstacle(Obstacle obstacle)
     {
+        //todo debugging
+        if (obstaclesWithCollision == null) obstaclesWithCollision = new ArrayList<>();
         obstaclesWithCollision.add(obstacle);
     }
 
@@ -244,6 +245,8 @@ public class Main extends Application implements GraphicsEngine
     @Override
     public void scheduleObstacleRemoval(Obstacle obstacle)
     {
+        //todo debugging
+        if (obstaclesToRemove == null) obstaclesToRemove = new ArrayList<>();
         obstaclesToRemove.add(obstacle);
     }
 
