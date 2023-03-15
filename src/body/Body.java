@@ -67,6 +67,20 @@ public abstract class Body
         calculateTransformAndShape();
     }
 
+    public float getRotation()
+    {
+        return rotation;
+    }
+
+    public void setRotation(float rotation)
+    {
+        this.rotation = rotation;
+        if (this.rotation < 0) this.rotation += Math.PI * 2;
+        else if (this.rotation >= Math.PI * 2) this.rotation -= Math.PI * 2;
+
+        calculateTransformAndShape();
+    }
+
     public float getRotationDegrees()
     {
         return (float) Math.toDegrees(rotation);
@@ -75,6 +89,9 @@ public abstract class Body
     public void setRotationDegrees(float rotation)
     {
         this.rotation = (float) Math.toRadians(rotation);
+        if (this.rotation < 0) this.rotation += Math.PI * 2;
+        else if (this.rotation >= Math.PI * 2) this.rotation -= Math.PI * 2;
+
         calculateTransformAndShape();
     }
 

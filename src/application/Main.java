@@ -14,7 +14,6 @@ import org.jfree.fx.FXGraphics2D;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -39,6 +38,9 @@ public class Main extends Application implements GraphicsEngine
     private ArrayList<BufferedImage> obstacleSprites;
 
     private double obstacleSpawnTime;
+
+    //todo debugging
+    private Rectangle2D debugShape;
 
     @Override
     public void init()
@@ -110,8 +112,7 @@ public class Main extends Application implements GraphicsEngine
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception
-    {
+    public void start(Stage primaryStage) {
         FXGraphics2D graphics = new FXGraphics2D(canvas.getGraphicsContext2D());
         graphics.scale(1, -1);
         graphics.translate(0, -canvas.getHeight());
@@ -124,7 +125,7 @@ public class Main extends Application implements GraphicsEngine
         primaryStage.setTitle("Infigeo");
         primaryStage.show();
 
-//        new AccumulationTimer(60, this, graphics);
+        new AccumulationTimer(60, this, graphics);
     }
 
     @Override
@@ -149,12 +150,18 @@ public class Main extends Application implements GraphicsEngine
                     1,
                     this
             ));
-//            obstacles.add(new Block(
-//                    obstacleSprites,
-//                    new Point2D.Double(canvas.getWidth() + 75, 345),
-//                    1,
-//                    this
-//            ));
+            obstacles.add(new Block(
+                    obstacleSprites,
+                    new Point2D.Double(canvas.getWidth() + 150, 270),
+                    1,
+                    this
+            ));
+            obstacles.add(new Block(
+                    obstacleSprites,
+                    new Point2D.Double(canvas.getWidth(), 345),
+                    1,
+                    this
+            ));
             obstacleSpawnTime = 2 + Math.random();
         }
         obstacleSpawnTime -= deltaTime;
@@ -188,11 +195,10 @@ public class Main extends Application implements GraphicsEngine
             // If the player's Area and fatalCollisionArea's Area overlap,
             // then the player is dead.
             Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
-            if (collisionShape.getWidth() > 14)
+            if (collisionShape.getHeight() > 25)
             {
-                System.out.println(collisionShape.getWidth());
-//                gameOver();
-//                return;
+                gameOver();
+                return;
             }
         }
 
@@ -212,15 +218,14 @@ public class Main extends Application implements GraphicsEngine
         collisionArea.intersect(new Area(player.getTransformedShape()));
 
         // Check for non-fatal collisions
-        if (!collisionArea.isEmpty() && player.getAcceleration() < 0)
+        if (collisionArea.isEmpty())
         {
-            // Correct the player's position to be right above the platform
-            // which it is grounded on.
-            player.setPosition(new Point2D.Double(
-                    player.getPosition().getX(),
-                    player.getPosition().getY() + collisionArea.getBounds2D().getHeight()
-            ));
-            player.setGrounded(true);
+            if (player.isGrounded() && Math.round(player.getRotationDegrees() % 90) == 0)
+                player.unground();
+        }
+        else if (player.getyAcceleration() < 0)
+        {
+            player.ground(collisionArea.getBounds2D().getY() + collisionArea.getBounds2D().getHeight());
         }
     }
 
@@ -237,6 +242,13 @@ public class Main extends Application implements GraphicsEngine
 
         for (Obstacle obstacle : obstacles)
             obstacle.draw(graphics);
+
+        if (debugShape != null)
+        {
+            graphics.setColor(Color.RED);
+            graphics.fill(debugShape);
+            graphics.setColor(Color.BLACK);
+        }
     }
 
     @Override
