@@ -5,24 +5,33 @@ import body.Obstacle;
 import java.util.ArrayList;
 
 public class MapSection {
-    private Obstacle[][] obstacleMap;
+    private final Obstacle[][] obstacleMap;
+    private final int mapWidth;
 
-    public MapSection(Obstacle[][] obstacleMap)
+    public MapSection(Obstacle[][] obstacleMap, int mapWidth)
     {
         this.obstacleMap = obstacleMap;
+        this.mapWidth = mapWidth;
     }
 
     public ArrayList<Obstacle> getColumn(int number)
     {
         ArrayList<Obstacle> obstacleColumn = new ArrayList<>();
         for (Obstacle[] obstacleRow : obstacleMap)
-            if (obstacleRow[number] != null)
-                obstacleColumn.add(obstacleRow[number]);
+        {
+            Obstacle obstacle = obstacleRow[number];
+            if (obstacle != null)
+            {
+                obstacle.reset();
+                obstacleColumn.add(obstacle);
+            }
+        }
+
         return obstacleColumn;
     }
 
     public int getWidth()
     {
-        return obstacleMap[0].length;
+        return mapWidth;
     }
 }

@@ -119,7 +119,7 @@ public class Player extends Body
         setPosition(new Point2D.Double(position.getX(), endY));
     }
 
-    public void unground()
+    public void unGround()
     {
         isGrounded = false;
     }

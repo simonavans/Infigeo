@@ -19,6 +19,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Main extends Application implements GraphicsEngine
 {
@@ -30,7 +31,7 @@ public class Main extends Application implements GraphicsEngine
     private ArrayList<ScrollableBody> scrollableBodies;
     private ScrollableBody ground;
     private Player player;
-    private ArrayList<Obstacle> obstacles;
+    public ArrayList<Obstacle> obstacles;
     private ArrayList<Obstacle> obstaclesWithCollision;
     private ArrayList<Obstacle> obstaclesToRemove;
 
@@ -51,7 +52,7 @@ public class Main extends Application implements GraphicsEngine
 
         try
         {
-            this.mapSections = MapIO.loadMap(ImageIO.read(getClass().getResource("/obstacles.png")), canvas.getWidth());
+            this.mapSections = MapIO.loadMap(ImageIO.read(getClass().getResource("/obstacles.png")), canvas.getWidth(), this);
             BufferedImage cubeIconSheet = ImageIO.read(getClass().getResource("/icons_cube.png"));
             cubeIcons = new ArrayList<>();
             for (int i = 0; i < 10; i++)
@@ -138,11 +139,9 @@ public class Main extends Application implements GraphicsEngine
         for (ScrollableBody scrollableBody : scrollableBodies)
             scrollableBody.update(deltaTime);
 
-        // Spawn obstacles at random intervals
         if (obstacleSpawnTime <= 0)
         {
-            ArrayList<Obstacle> obstacleColumn = mapSections.get(0).getColumn(currentMapColumn);
-            obstacles.addAll(obstacleColumn);
+            obstacles.addAll(mapSections.get(0).getColumn(currentMapColumn));
 
             currentMapColumn = (currentMapColumn + 1) % mapSections.get(0).getWidth();
             obstacleSpawnTime = 0.083;
@@ -150,8 +149,11 @@ public class Main extends Application implements GraphicsEngine
         obstacleSpawnTime -= deltaTime;
 
         // Update obstacles
-        for (Obstacle obstacle : obstacles)
-            obstacle.update(deltaTime);
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle != null)
+                obstacle.update(deltaTime);
+        }
+        obstacles.removeIf(Objects::isNull);
 
         // Remove obstacles which are out of bounds
         for (Obstacle obstacle : obstaclesToRemove)
@@ -181,8 +183,8 @@ public class Main extends Application implements GraphicsEngine
             Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
             if (collisionShape.getHeight() > 25)
             {
-                gameOver();
-                return;
+//                gameOver();
+//                return;
             }
         }
 
@@ -205,7 +207,7 @@ public class Main extends Application implements GraphicsEngine
         if (collisionArea.isEmpty())
         {
             if (player.isGrounded() && Math.round(player.getRotationDegrees() % 90) == 0)
-                player.unground();
+                player.unGround();
         }
         else if (player.getyAcceleration() < 0)
         {
@@ -235,11 +237,10 @@ public class Main extends Application implements GraphicsEngine
         }
     }
 
+    //todo debugging
     @Override
     public void addCollisionToObstacle(Obstacle obstacle)
     {
-        //todo debugging
-        if (obstaclesWithCollision == null) obstaclesWithCollision = new ArrayList<>();
         obstaclesWithCollision.add(obstacle);
     }
 
@@ -252,9 +253,7 @@ public class Main extends Application implements GraphicsEngine
     @Override
     public void scheduleObstacleRemoval(Obstacle obstacle)
     {
-        //todo debugging
-        if (obstaclesToRemove == null) obstaclesToRemove = new ArrayList<>();
-        obstaclesToRemove.add(obstacle);
+        obstacles.set(obstacles.indexOf(obstacle), null);
     }
 
     private void gameOver()

@@ -9,11 +9,12 @@ import java.awt.image.BufferedImage;
 
 public abstract class Obstacle extends Body
 {
-    private final double scrollSpeed;
+    private double scrollSpeed;
     private double currentScroll;
     private final GraphicsEngine callback;
 
     private boolean hasCollision;
+    private final Point2D startPos;
 
     public Obstacle(Shape shape, BufferedImage texture, Point2D position, float scale, GraphicsEngine callback)
     {
@@ -22,6 +23,8 @@ public abstract class Obstacle extends Body
         scrollSpeed = Main.LEVEL_SCROLL_SPEED;
         currentScroll = position.getX();
         this.callback = callback;
+
+        this.startPos = position;
     }
 
     @Override
@@ -42,5 +45,11 @@ public abstract class Obstacle extends Body
         {
             callback.scheduleObstacleRemoval(this);
         }
+    }
+
+    public void reset()
+    {
+        setPosition(startPos);
+        currentScroll = position.getX();
     }
 }
