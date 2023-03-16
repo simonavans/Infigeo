@@ -103,10 +103,17 @@ public class Main extends Application implements GraphicsEngine
             canvas.setFocusTraversable(true);
             canvas.setOnKeyPressed(e ->
             {
-                if (e.getCode() == KeyCode.SPACE) player.jump();
-                else if (e.getCode() == KeyCode.E) player.cycleIcon();
+                if (e.getCode() == KeyCode.SPACE)
+                    player.setHoldingJumpButton(true);
+                else if (e.getCode() == KeyCode.E)
+                    player.cycleIcon();
                 //todo debugging
                 else if (e.getCode() == KeyCode.RIGHT) { update(1 / 60d); draw(graphics); }
+            });
+            canvas.setOnKeyReleased(e ->
+            {
+                if (e.getCode() == KeyCode.SPACE)
+                    player.setHoldingJumpButton(false);
             });
         }
         catch (IOException e)
@@ -144,7 +151,7 @@ public class Main extends Application implements GraphicsEngine
             obstacles.addAll(mapSections.get(0).getColumn(currentMapColumn));
 
             currentMapColumn = (currentMapColumn + 1) % mapSections.get(0).getWidth();
-            obstacleSpawnTime = 0.083;
+            obstacleSpawnTime = 5 * deltaTime;
         }
         obstacleSpawnTime -= deltaTime;
 
@@ -194,8 +201,8 @@ public class Main extends Application implements GraphicsEngine
         spikeArea.intersect(new Area(player.getTransformedShape()));
         if (!spikeArea.isEmpty())
         {
-            gameOver();
-            return;
+//            gameOver();
+//            return;
         }
 
         // Create an Area that combines collisionArea and
@@ -209,7 +216,7 @@ public class Main extends Application implements GraphicsEngine
             if (player.isGrounded() && Math.round(player.getRotationDegrees() % 90) == 0)
                 player.unGround();
         }
-        else if (player.getyAcceleration() < 0)
+        else if (player.getYAcceleration() < 0)
         {
             player.ground(collisionArea.getBounds2D().getY() + collisionArea.getBounds2D().getHeight());
         }

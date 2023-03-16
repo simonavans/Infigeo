@@ -11,7 +11,7 @@ public abstract class Obstacle extends Body
 {
     private double scrollSpeed;
     private double currentScroll;
-    private final GraphicsEngine callback;
+    protected final GraphicsEngine callback;
 
     private boolean hasCollision;
     private final Point2D startPos;
@@ -49,7 +49,10 @@ public abstract class Obstacle extends Body
 
     public void reset()
     {
+        System.out.println("reset");
         setPosition(startPos);
         currentScroll = position.getX();
     }
+
+    public abstract Obstacle getCloned();
 }

@@ -22,8 +22,7 @@ public class MapSection {
             Obstacle obstacle = obstacleRow[number];
             if (obstacle != null)
             {
-                obstacle.reset();
-                obstacleColumn.add(obstacle);
+                obstacleColumn.add(obstacle.getCloned());
             }
         }
 

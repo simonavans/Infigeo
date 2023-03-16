@@ -40,7 +40,7 @@ public class ScrollableBody extends Body
     public void draw(FXGraphics2D graphics)
     {
         graphics.setPaint(new TexturePaint(
-                texture,
+                sprite,
                 new Rectangle2D.Double(currentScroll, 0, textureWidth, textureHeight)
         ));
         graphics.fill(shape);

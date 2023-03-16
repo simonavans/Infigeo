@@ -18,11 +18,10 @@ public class Player extends Body
     private double yAcceleration;
     private boolean isGrounded;
 
-    //todo debugging
-//    private float overRotationDegrees;
     private float rotationIncrementDegrees;
     private int iconCycle;
     private final double initialPosY;
+    private boolean isHoldingJumpButton;
 
     public Player(Shape shape, ArrayList<BufferedImage> cubeIcons, Point2D position, float rotation, float scale, double gravity)
     {
@@ -45,6 +44,13 @@ public class Player extends Body
             yAcceleration -= gravity;
             setPosition(new Point2D.Double(position.getX(), position.getY() + yAcceleration));
             setRotationDegrees(getRotationDegrees() - ROTATE_SPEED_FALLING);
+            return;
+        }
+
+        if (isHoldingJumpButton)
+        {
+            yAcceleration = 28;
+            isGrounded = false;
         }
         else if (getRotationDegrees() % 90 != 0)
         {
@@ -71,18 +77,15 @@ public class Player extends Body
         }
     }
 
-    public void jump()
+    public void setHoldingJumpButton(boolean isHoldingJumpButton)
     {
-        if (!isGrounded) return;
-
-        yAcceleration = 28;
-        isGrounded = false;
+        this.isHoldingJumpButton = isHoldingJumpButton;
     }
 
     public void cycleIcon()
     {
         iconCycle = (iconCycle + 1) % cubeIcons.size();
-        texture = cubeIcons.get(iconCycle);
+        sprite = cubeIcons.get(iconCycle);
     }
 
     public void reset()
@@ -99,7 +102,7 @@ public class Player extends Body
         this.gravity = gravity;
     }
 
-    public double getyAcceleration()
+    public double getYAcceleration()
     {
         return yAcceleration;
     }

@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 public abstract class Body
 {
     protected Shape shape;
-    protected BufferedImage texture;
+    protected BufferedImage sprite;
     protected Point2D position;
     protected float rotation;
     protected float scale;
@@ -18,10 +18,10 @@ public abstract class Body
     protected AffineTransform transform;
     protected Shape transformedShape;
 
-    public Body(Shape shape, BufferedImage texture, Point2D position, float rotation, float scale)
+    public Body(Shape shape, BufferedImage sprite, Point2D position, float rotation, float scale)
     {
         this.shape = shape;
-        this.texture = texture;
+        this.sprite = sprite;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
@@ -31,7 +31,7 @@ public abstract class Body
 
     public void draw(FXGraphics2D graphics)
     {
-        graphics.drawImage(texture, transform, null);
+        graphics.drawImage(sprite, transform, null);
     }
 
     protected void calculateTransformAndShape()

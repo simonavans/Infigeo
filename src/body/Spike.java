@@ -22,4 +22,9 @@ public class Spike extends Obstacle {
 
         calculateTransformAndShape();
     }
+
+    @Override
+    public Obstacle getCloned() {
+        return new Spike(sprite, position, scale, callback);
+    }
 }

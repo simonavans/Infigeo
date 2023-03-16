@@ -48,8 +48,8 @@ public class MapIO
                 // Loop through all the rows of the section
                 for (int y = 0; y < section.size(); y++)
                 {
-//                    JsonArray sectionRow = section.getJsonArray(section.size()-1-y);
-                    JsonArray sectionRow = section.getJsonArray(y);
+                    JsonArray sectionRow = section.getJsonArray(section.size()-1-y);
+//                    JsonArray sectionRow = section.getJsonArray(y);
 
                     // Loop through all elements of one section row
                     for (int x = 0; x < sectionRow.size(); x++)
@@ -60,7 +60,8 @@ public class MapIO
                             case 1:
                                 obstacleMap[y][x] = new Block(
                                         blockImage,
-                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+//                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+                                        new Point2D.Double(canvasWidth + 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
@@ -68,7 +69,8 @@ public class MapIO
                             case 2:
                                 obstacleMap[y][x] = new Spike(
                                         spikeUpImage,
-                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+//                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+                                        new Point2D.Double(canvasWidth + 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
@@ -76,7 +78,8 @@ public class MapIO
                             case 3:
                                 obstacleMap[y][x] = new Spike(
                                         spikeDownImage,
-                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+//                                        new Point2D.Double(canvasWidth + x * 75, 270 + y * 75),
+                                        new Point2D.Double(canvasWidth + 75, 270 + y * 75),
                                         1,
                                         callback
                                 );
