@@ -11,13 +11,16 @@ public class Player extends Body
     private final int ROTATE_SPEED_FALLING = 6;
     // The speed at which the cube rotates when it lands
     private final int ROTATE_SPEED_LANDING = 12;
+    private final int ROTATION_RATIO_LANDING = 10;
 
     private final ArrayList<BufferedImage> cubeIcons;
     private double gravity;
-    private Point2D acceleration;
+    private double yAcceleration;
     private boolean isGrounded;
 
-    private float overRotationDegrees;
+    //todo debugging
+//    private float overRotationDegrees;
+    private float rotationIncrementDegrees;
     private int iconCycle;
     private final double initialPosY;
 
@@ -27,7 +30,6 @@ public class Player extends Body
 
         this.cubeIcons = cubeIcons;
         this.gravity = gravity;
-        acceleration = new Point2D.Double();
         initialPosY = position.getY();
 
         calculateTransformAndShape();
@@ -40,35 +42,40 @@ public class Player extends Body
         {
             // If the player is not grounded, increase the acceleration with gravity
             // and increment the rotation of the player
-            acceleration = new Point2D.Double(0, acceleration.getY() - gravity);
+            yAcceleration -= gravity;
+            setPosition(new Point2D.Double(position.getX(), position.getY() + yAcceleration));
             setRotationDegrees(getRotationDegrees() - ROTATE_SPEED_FALLING);
         }
-        else if (overRotationDegrees != 0)
+        else if (getRotationDegrees() % 90 != 0)
         {
-            // If the player is slightly tilted on the platform it is grounded on,
-            // correct the rotation of the player.
-            if (overRotationDegrees <= -45)
-                overRotationDegrees = roundToMultiple((overRotationDegrees - ROTATE_SPEED_LANDING) % 90, ROTATE_SPEED_LANDING);
-            else
-                overRotationDegrees = roundToMultiple((overRotationDegrees + ROTATE_SPEED_LANDING) % 90, ROTATE_SPEED_LANDING);
+            float rotationDeg = Math.round(getRotationDegrees());
 
-            setPosition(new Point2D.Double(position.getX(), position.getY() - 5));
-            setRotationDegrees(overRotationDegrees);
+            if (
+                    rotationDeg > 0 && rotationDeg < 45 ||
+                    rotationDeg > 90 && rotationDeg < 135 ||
+                    rotationDeg > 180 && rotationDeg < 225 ||
+                    rotationDeg > 270 && rotationDeg < 315
+            )
+            {
+                setRotationDegrees(rotationDeg - rotationIncrementDegrees);
+            }
+            else if (
+                    rotationDeg >= 45 && rotationDeg < 90 ||
+                            rotationDeg >= 135 && rotationDeg < 180 ||
+                            rotationDeg >= 225 && rotationDeg < 270 ||
+                            rotationDeg >= 315 && rotationDeg < 360
+            )
+            {
+                setRotationDegrees(rotationDeg + rotationIncrementDegrees);
+            }
         }
-        else
-        {
-            acceleration = new Point2D.Double(0, acceleration.getY() - gravity);
-        }
-
-        setPosition(new Point2D.Double(position.getX(), position.getY() + acceleration.getY()));
     }
 
     public void jump()
     {
         if (!isGrounded) return;
 
-        overRotationDegrees = 0;
-        acceleration = new Point2D.Double(0, 28);
+        yAcceleration = 28;
         isGrounded = false;
     }
 
@@ -84,8 +91,7 @@ public class Player extends Body
         setRotationDegrees(0);
 
         isGrounded = false;
-        overRotationDegrees = 0;
-        acceleration = new Point2D.Double();
+        yAcceleration = 0;
     }
 
     public void setGravity(double gravity)
@@ -93,9 +99,9 @@ public class Player extends Body
         this.gravity = gravity;
     }
 
-    public double getAcceleration()
+    public double getyAcceleration()
     {
-        return acceleration.getY();
+        return yAcceleration;
     }
 
     public boolean isGrounded()
@@ -103,14 +109,19 @@ public class Player extends Body
         return isGrounded;
     }
 
-    public void setGrounded(boolean grounded)
+    public void ground(double endY)
     {
-        isGrounded = grounded;
-        if (isGrounded)
-        {
-            overRotationDegrees = getRotationDegrees() % 90;
-            acceleration = new Point2D.Double(0, 0);
-        }
+        isGrounded = true;
+        yAcceleration = 0;
+
+        setRotationDegrees(roundToMultiple(getRotationDegrees(), 9));
+        rotationIncrementDegrees = 9;
+        setPosition(new Point2D.Double(position.getX(), endY));
+    }
+
+    public void unground()
+    {
+        isGrounded = false;
     }
 
     private float roundToMultiple(float number, int multiple)
