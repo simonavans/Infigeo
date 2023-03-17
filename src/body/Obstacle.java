@@ -47,12 +47,5 @@ public abstract class Obstacle extends Body
         }
     }
 
-    public void reset()
-    {
-        System.out.println("reset");
-        setPosition(startPos);
-        currentScroll = position.getX();
-    }
-
     public abstract Obstacle getCloned();
 }

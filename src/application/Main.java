@@ -37,7 +37,6 @@ public class Main extends Application implements GraphicsEngine
     private Player player;
     public ArrayList<Obstacle> obstacles;
     private ArrayList<Obstacle> obstaclesWithCollision;
-    private ArrayList<Obstacle> obstaclesToRemove;
 
     private ArrayList<MapSection> mapSections;
     private ArrayList<BufferedImage> cubeIcons;
@@ -48,6 +47,7 @@ public class Main extends Application implements GraphicsEngine
     private double obstacleSpawnTime;
     private int currentMapColumn;
     private int currentMapSection;
+    private boolean isPaused;
 
     //todo debugging
     private Rectangle2D debugShape;
@@ -100,7 +100,6 @@ public class Main extends Application implements GraphicsEngine
             );
 
             obstacles = new ArrayList<>();
-            obstaclesToRemove = new ArrayList<>();
             obstaclesWithCollision = new ArrayList<>();
 
             FXGraphics2D graphics = new FXGraphics2D(canvas.getGraphicsContext2D());
@@ -158,6 +157,8 @@ public class Main extends Application implements GraphicsEngine
     @Override
     public void update(double deltaTime)
     {
+        if (isPaused) return;
+
         // Update textures of ScrollableBodies
         for (ScrollableBody scrollableBody : scrollableBodies)
             scrollableBody.update(deltaTime);
@@ -178,11 +179,6 @@ public class Main extends Application implements GraphicsEngine
                 obstacle.update(deltaTime);
         }
         obstacles.removeIf(Objects::isNull);
-
-        // Remove obstacles which are out of bounds
-        for (Obstacle obstacle : obstaclesToRemove)
-            obstacles.remove(obstacle);
-        obstaclesToRemove.clear();
 
         // Create an Area which amounts to the surface of
         // all elements in objectsWithCollision
@@ -248,7 +244,7 @@ public class Main extends Application implements GraphicsEngine
         for (ScrollableBody scrollableBody : scrollableBodies)
             scrollableBody.draw(graphics);
 
-        player.draw(graphics);
+        if (!isPaused) player.draw(graphics);
 
         for (Obstacle obstacle : obstacles)
             obstacle.draw(graphics);
@@ -282,13 +278,9 @@ public class Main extends Application implements GraphicsEngine
 
     private void gameOver()
     {
-        obstaclesToRemove.clear();
-        obstaclesWithCollision.clear();
-        obstacles.clear();
-        obstacleSpawnTime = 2 + Math.random();
-        player.reset();
         obstacleSpawnTime = 0;
         currentMapColumn = 0;
+        isPaused = true;
 
         mediaPlayer.stop();
         mediaPlayer.setAutoPlay(false);
@@ -297,12 +289,18 @@ public class Main extends Application implements GraphicsEngine
         );
         mediaPlayer.play();
         mediaPlayer.setOnEndOfMedia(() -> {
-           mediaPlayer = new MediaPlayer(new Media(
+            player.reset();
+            isPaused = false;
+
+            mediaPlayer = new MediaPlayer(new Media(
                     Paths.get("resources/sound/StereoMadness.mp3").toUri().toString())
             );
             mediaPlayer.setAutoPlay(true);
             mediaPlayer.play();
         });
+
+        obstaclesWithCollision.clear();
+        obstacles.clear();
     }
 
     public static void main(String[] args)
