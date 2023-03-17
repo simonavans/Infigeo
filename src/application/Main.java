@@ -8,6 +8,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
@@ -17,7 +19,9 @@ import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,6 +42,8 @@ public class Main extends Application implements GraphicsEngine
     private ArrayList<MapSection> mapSections;
     private ArrayList<BufferedImage> cubeIcons;
     private ArrayList<BufferedImage> obstacleSprites;
+
+    private MediaPlayer mediaPlayer;
 
     private double obstacleSpawnTime;
     private int currentMapColumn;
@@ -136,6 +142,15 @@ public class Main extends Application implements GraphicsEngine
         primaryStage.setTitle("Infigeo");
         primaryStage.show();
 
+        this.mediaPlayer = new MediaPlayer(new Media(
+                Paths.get("resources/sound/StereoMadness.mp3").toUri().toString())
+        );
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.play();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            mediaPlayer.stop();
+        });
+
         new AccumulationTimer(60, this, graphics);
     }
 
@@ -190,8 +205,8 @@ public class Main extends Application implements GraphicsEngine
             Rectangle2D collisionShape = fatalCollisionArea.getBounds2D();
             if (collisionShape.getHeight() > 25)
             {
-//                gameOver();
-//                return;
+                gameOver();
+                return;
             }
         }
 
@@ -201,8 +216,8 @@ public class Main extends Application implements GraphicsEngine
         spikeArea.intersect(new Area(player.getTransformedShape()));
         if (!spikeArea.isEmpty())
         {
-//            gameOver();
-//            return;
+            gameOver();
+            return;
         }
 
         // Create an Area that combines collisionArea and
@@ -270,6 +285,22 @@ public class Main extends Application implements GraphicsEngine
         obstacles.clear();
         obstacleSpawnTime = 2 + Math.random();
         player.reset();
+        obstacleSpawnTime = 0;
+        currentMapColumn = 0;
+
+        mediaPlayer.stop();
+        mediaPlayer.setAutoPlay(false);
+        mediaPlayer = new MediaPlayer(new Media(
+                Paths.get("resources/sound/explode_11.mp3").toUri().toString())
+        );
+        mediaPlayer.play();
+        mediaPlayer.setOnEndOfMedia(() -> {
+           mediaPlayer = new MediaPlayer(new Media(
+                    Paths.get("resources/sound/StereoMadness.mp3").toUri().toString())
+            );
+            mediaPlayer.setAutoPlay(true);
+            mediaPlayer.play();
+        });
     }
 
     public static void main(String[] args)
