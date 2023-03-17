@@ -47,6 +47,7 @@ public class Main extends Application implements GraphicsEngine
 
     private double obstacleSpawnTime;
     private int currentMapColumn;
+    private int currentMapSection;
 
     //todo debugging
     private Rectangle2D debugShape;
@@ -163,9 +164,10 @@ public class Main extends Application implements GraphicsEngine
 
         if (obstacleSpawnTime <= 0)
         {
-            obstacles.addAll(mapSections.get(0).getColumn(currentMapColumn));
+            obstacles.addAll(mapSections.get(currentMapSection).getColumn(currentMapColumn));
 
-            currentMapColumn = (currentMapColumn + 1) % mapSections.get(0).getWidth();
+            currentMapColumn = (currentMapColumn + 1) % mapSections.get(currentMapSection).getWidth();
+            if (currentMapColumn == 0) currentMapSection = (currentMapSection + 1) % mapSections.size();
             obstacleSpawnTime = 5 * deltaTime;
         }
         obstacleSpawnTime -= deltaTime;
