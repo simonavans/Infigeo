@@ -15,7 +15,7 @@ public class Spike extends Obstacle {
         GeneralPath triangle = new GeneralPath();
         triangle.moveTo(0, 0);
         triangle.lineTo(75, 0);
-        triangle.lineTo(37.5, 70);
+        triangle.lineTo(37.5, 60);
         triangle.lineTo(0, 0);
         triangle.closePath();
         shape = triangle;

@@ -27,7 +27,7 @@ import java.util.Objects;
 
 public class Main extends Application implements GraphicsEngine
 {
-    public static final double LEVEL_SCROLL_SPEED = 800;
+    public static final double LEVEL_SCROLL_SPEED = 920;
 
     private Canvas canvas;
     private Label mousePosLog;
@@ -74,7 +74,7 @@ public class Main extends Application implements GraphicsEngine
             BufferedImage backgroundImage = ImageIO.read(getClass().getResource("/background.png"));
             scrollableBodies.add(new ScrollableBody(
                     backgroundImage,
-                    200,
+                    50,
                     backgroundImage.getWidth() * 2,
                     canvas.getHeight(),
                     canvas.getWidth(),
@@ -96,7 +96,7 @@ public class Main extends Application implements GraphicsEngine
                     new Point2D.Double(700, canvas.getHeight()/3),
                     0,
                     1,
-                    2
+                    2.2
             );
 
             obstacles = new ArrayList<>();
@@ -169,7 +169,7 @@ public class Main extends Application implements GraphicsEngine
 
             currentMapColumn = (currentMapColumn + 1) % mapSections.get(currentMapSection).getWidth();
             if (currentMapColumn == 0) currentMapSection = (currentMapSection + 1) % mapSections.size();
-            obstacleSpawnTime = 5 * deltaTime;
+            obstacleSpawnTime = 4 * deltaTime;
         }
         obstacleSpawnTime -= deltaTime;
 

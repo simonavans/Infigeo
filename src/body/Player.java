@@ -8,10 +8,7 @@ import java.util.ArrayList;
 public class Player extends Body
 {
     // The speed at which the cube rotates when jumping/falling
-    private final int ROTATE_SPEED_FALLING = 6;
-    // The speed at which the cube rotates when it lands
-    private final int ROTATE_SPEED_LANDING = 12;
-    private final int ROTATION_RATIO_LANDING = 10;
+    private final int ROTATE_SPEED_FALLING = 7;
 
     private final ArrayList<BufferedImage> cubeIcons;
     private double gravity;
@@ -49,7 +46,7 @@ public class Player extends Body
 
         if (isHoldingJumpButton)
         {
-            yAcceleration = 28;
+            yAcceleration = 27;
             isGrounded = false;
         }
         else if (getRotationDegrees() % 90 != 0)
