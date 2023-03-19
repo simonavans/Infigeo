@@ -280,6 +280,7 @@ public class Main extends Application implements GraphicsEngine
     {
         obstacleSpawnTime = 0;
         currentMapColumn = 0;
+        currentMapSection = 0;
         isPaused = true;
 
         mediaPlayer.stop();
